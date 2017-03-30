@@ -14,6 +14,7 @@ with open('Province.json') as f:
     cities = {i['name']: [j['name'] for j in i['Cities']] for i in tmp}
 
 GENDER, FIRST_NAME, LAST_NAME, MOBILE, PROVINCE, CITY, PICTURE, COMMENT = range(8)
+
 back_button = 'برگشت'
 menu_button = '/start'
 agree_button = 'قبول'
@@ -182,3 +183,129 @@ handler = ConversationHandler(
 
     fallbacks=[CommandHandler('cancel', cancel)]
 )
+
+
+choice_dict = {'جنسیت': "gender",
+               'تاریخ تولد': 'birth_date',
+               }
+
+from telegram import ReplyKeyboardMarkup
+from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler,
+                          ConversationHandler)
+
+CHOOSING, TYPING_REPLY, TYPING_CHOICE = range(3)
+
+reply_keyboard = [['جنسیت', 'تاریخ تولد'],
+                  ['نام', 'فامیل'],
+                  ['پایان']]
+markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True)
+
+
+def view_profile(user_data):
+
+    facts = list()
+
+    for key, value in user_data.items():
+        facts.append('%s - %s' % (key, value))
+
+    return "\n".join(facts).join(['\n', '\n'])
+
+
+def start(bot, update, user_data):
+    print(user_data)
+    telegram_user = update.message.from_user
+    user = session.query(User).filter_by(telegram_id=telegram_user.id).first()
+    i = update.message.chat_id
+    if user:
+        update.message.reply_text(
+                        'شما قبلا در این سامانه ثبت نام کرده اید '
+                        'ادامه این فرآیند پروفایل شما را به روز می کند'
+                        ' در صورت انصراف می توانید /cancel را بزنید', reply_markup=markup)
+        # users[i] = user
+    else:
+        user = User()
+        user.chat_id = i
+        user.telegram_id = telegram_user.id
+        user.username = telegram_user.username if telegram_user.username else ''
+        user.first_name = telegram_user.first_name if telegram_user.first_name else ''
+        user.last_name = telegram_user.last_name if telegram_user.last_name else ''
+        # users[i] = user
+        session.add(user)
+
+        session.commit()
+    user_data['user'] = user
+    update.message.reply_text(
+        "گزینه های زیر را تکمیل کنید",
+        reply_markup=markup)
+
+    return CHOOSING
+
+
+def regular_choice(bot, update, user_data):
+    print(user_data)
+    text = update.message.text
+    user_data['choice'] = text
+    update.message.reply_text('%s را وارد کنید' % text.lower())
+
+    return TYPING_REPLY
+
+
+def custom_choice(bot, update):
+    update.message.reply_text('Alright, please send me the category first, '
+                              'for example "Most impressive skill"')
+
+    return TYPING_CHOICE
+
+
+def received_information(bot, update, user_data):
+    text = update.message.text
+    category = user_data['choice']
+    user_data[category] = text
+    del user_data['choice']
+
+    update.message.reply_text("Neat! Just so you know, this is what you already told me:"
+                              "%s"
+                              "You can tell me more, or change your opinion on something."
+                              % view_profile(user_data),
+                              reply_markup=markup)
+
+    return CHOOSING
+
+
+def done(bot, update, user_data):
+    if 'choice' in user_data:
+        del user_data['choice']
+
+    update.message.reply_text("ویرایش پروفایل شما به پایان رسید:"
+                              "%s" % view_profile(user_data))
+
+    user_data.clear()
+    return ConversationHandler.END
+
+
+
+handler = ConversationHandler(
+    entry_points=[CommandHandler('register', start, pass_user_data=True)],
+
+    states={
+        CHOOSING: [RegexHandler('^(جنسیت|تاریخ تولد|نام|فامیل)$',
+                                regular_choice,
+                                pass_user_data=True),
+                   # RegexHandler('^Something else...$',
+                   #              custom_choice),
+                   ],
+
+        TYPING_CHOICE: [MessageHandler(Filters.text,
+                                       regular_choice,
+                                       pass_user_data=True),
+                        ],
+
+        TYPING_REPLY: [MessageHandler(Filters.text,
+                                      received_information,
+                                      pass_user_data=True),
+                       ],
+    },
+
+    fallbacks=[RegexHandler('^پایان$', done, pass_user_data=True)]
+)
+
