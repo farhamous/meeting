@@ -82,12 +82,6 @@ def register_start(bot, update):
     return next_step(bot, update, FIRST_NAME)
 
 
-def register_first_name(bot, update):
-
-    i = update.message.chat_id
-    users[i].gender = update.message.text
-    session.commit()
-    return next_step(bot, update, FIRST_NAME)
 
 def register_first_name(bot, update):
 
