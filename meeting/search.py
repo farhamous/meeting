@@ -52,13 +52,14 @@ def search_start(bot, update, user_data):
         return ConversationHandler.END
     elif not user.city:
         bot.sendMessage(i,
-                        text='برای جستجو در آگهی ها انتخاب شهر و استان الزامی است /register ثبت نام خود را تکمیل کرده و سپس به جستجو خود بپردازید')
+                        text='برای جستجو انتخاب شهر و استان الزامی است /register ثبت نام خود را تکمیل کرده و سپس به جستجو خود بپردازید')
         return ConversationHandler.END
         # return next_step(bot, update, PROVINCE)
     else:
         users = session.query(User).filter_by(city=user.city).all()
-        founded_users = [user.first_name for user in users]
-        bot.sendMessage(i, str(founded_users))
+        for user in users:
+        # founded_users = [user.first_name for user in users]
+            bot.sendMessage(i, str(user.first_name))
         return ConversationHandler.END
         # return next_step(bot, update, PROVINCE)
 
