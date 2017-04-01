@@ -76,7 +76,7 @@ def register_start(bot, update, user_data):
     if user:
         user.last_update = int(time.time())
         session.commit()
-        update.message.reply_text( text='شما قبلا در این سامانه ثبت نام کرده اید ادامه این فرآیند پروفایل شما را به روز می کند در صورت انصراف می توانید /cancel را بزنید')
+        update.message.reply_text( text='ادامه این فرآیند پروفایل شما را به روز می کند در صورت انصراف می توانید /cancel را بزنید')
 
     else:
         user = User()

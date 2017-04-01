@@ -2,10 +2,11 @@ from telegram.bot import Bot
 from telegram.update import Update
 from telegram.ext import CommandHandler
 from meeting.db import User, session
+import time
 
 welcome_text = """
 سلام
-این یک ربات دوست یابی است
+این یک ربات دوست یابی و همسر یابی است
 شما در این ربات می توانید پروفایل را ایجاد کرده و در سایر پروفایل ها جستجو کنید"""
 
 hello_guest_text = """سلام
@@ -17,6 +18,7 @@ guide_text ="""می توانید با استفاده از /register پروفای
 def start(bot:Bot, update:Update, args):
     bot.sendMessage(chat_id=update.message.chat_id, text=welcome_text)
     telegram_user = update.message.from_user
+    i = update.message.chat_id
     user = session.query(User).filter_by(telegram_id = telegram_user.id).first()
     if user:
         if user.username == telegram_user.username:
@@ -27,6 +29,17 @@ def start(bot:Bot, update:Update, args):
             bot.sendMessage(chat_id=update.message.chat_id, text='you modified your account setting.')
 
     else:
+        user = User()
+        user.chat_id = i
+        user.telegram_id = telegram_user.id
+        user.username = telegram_user.username if telegram_user.username else ''
+        user.first_name = telegram_user.first_name if telegram_user.first_name else ''
+        user.last_name = telegram_user.last_name if telegram_user.last_name else ''
+        user.register_date = int(time.time())
+        user.last_update = int(time.time())
+        session.add(user)
+        session.commit()
+
         bot.sendMessage(chat_id=update.message.chat_id, text=hello_guest_text)
         bot.sendMessage(chat_id=update.message.chat_id, text=guide_text)
 
