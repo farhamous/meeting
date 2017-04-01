@@ -1,2 +1,6 @@
 develop.ini
 .idea
+*.egg-info
+picture
+*.sqlite
+delme.py
