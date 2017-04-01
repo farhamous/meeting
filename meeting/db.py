@@ -26,6 +26,7 @@ class User(Base):
     province = Column(String(32))
     city = Column(String(32))
     register_date = Column(Integer)
+    last_update = Column(Integer)
     comment = Column(String(1024))
     gender = Column(String(6))
     state = Column(String(10))
