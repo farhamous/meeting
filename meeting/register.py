@@ -45,7 +45,7 @@ def next_step(bot, update, step, user_data):
         contact_keyboard = telegram.KeyboardButton(text="send_contact", request_contact=True)
 
         reply_keyboard = [[contact_keyboard]]
-        text='شماره موبایل شما؟ یا شماره خود را با زدن دکمه پایین ارسال کنید'
+        text='شماره موبایل خود را وارد کنید یا شماره خود را با زدن دکمه پایین ارسال کنید'
 
     elif step == PROVINCE:
         reply_keyboard = [[i] for i in province]

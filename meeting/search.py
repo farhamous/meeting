@@ -69,7 +69,7 @@ def search_start(bot, update, user_data):
 
 def search_state(bot, update, user_data):
     if update.message.text == 'جستجو':
-        return next_step(bot, update, DO, user_data=user_data)
+        return search_do(bot, update, user_data=user_data)
     user_data['search_filter']={}
     user_data['search_filter']['state'] = update.message.text
 
@@ -78,7 +78,7 @@ def search_state(bot, update, user_data):
 
 def search_province(bot, update, user_data):
     if update.message.text == 'جستجو':
-        return next_step(bot, update, DO, user_data=user_data)
+        return search_do(bot, update, user_data=user_data)
 
     user_data['search_filter']['province'] = update.message.text
 
@@ -87,10 +87,10 @@ def search_province(bot, update, user_data):
 def search_city(bot, update, user_data):
     print('in city')
     if update.message.text == 'جستجو':
-        return next_step(bot, update, DO, user_data=user_data)
+        return search_do(bot, update, user_data=user_data)
 
     user_data['search_filter']['city'] = update.message.text
-    return next_step(bot, update, DO, user_data=user_data)
+    return search_do(bot, update, user_data=user_data)
 
 
 def search_do(bot, update, user_data):
@@ -103,11 +103,12 @@ def search_do(bot, update, user_data):
         search_filter['gender'] = 'دختر'
     else:
         search_filter['gender'] = 'تعیین نشده'
-    print(user.id, **search_filter)
+    print(user.id, search_filter)
     users = session.query(User).filter_by(**search_filter).all()
     for user in users:
         # founded_users = [user.first_name for user in users]
-        update.message.reply_text((str(user.first_name)))
+        update.message.reply_text("""نام:{0}
+        توضیحات:{1}""".format(user.first_name, user.comment))
 
     return ConversationHandler.END
 
