@@ -2,6 +2,12 @@ from sqlalchemy import create_engine
 from meeting import config
 from sqlalchemy.orm import sessionmaker
 
+
+from sqlalchemy_utils.functions import create_database, database_exists
+if not database_exists(config.sqlalchemy_url):
+    create_database(config.sqlalchemy_url)
+
+
 engine = create_engine(config.sqlalchemy_url, echo=False)
 
 Session = sessionmaker(bind=engine)

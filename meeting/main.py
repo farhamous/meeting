@@ -1,9 +1,5 @@
 from meeting import config
 
-from sqlalchemy_utils.functions import create_database, database_exists
-if not database_exists(config.sqlalchemy_url):
-    create_database(config.sqlalchemy_url)
-
 
 
 from telegram.ext import Updater
