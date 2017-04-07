@@ -6,14 +6,16 @@ import time
 
 welcome_text = """
 سلام
-این یک ربات دوست یابی و همسر یابی است
+این یک ربات همسر یابی است
 شما در این ربات می توانید پروفایل را ایجاد کرده و در سایر پروفایل ها جستجو کنید"""
 
 hello_guest_text = """سلام
 شما هنوز پروفایل خود را در این ربات کامل نکرده اید"""
 
 guide_text ="""می توانید با استفاده از /register پروفایل خود را کامل کنید 
-یا با استفاده از  /search جستجو کنید"""
+یا با استفاده از  /search جستجو کنید
+با /user_list می توانید لیست تمام افراد را ببینید
+"""
 
 def start(bot:Bot, update:Update, args):
     bot.sendMessage(chat_id=update.message.chat_id, text=welcome_text)
