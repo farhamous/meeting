@@ -5,7 +5,7 @@ from meeting import config
 from telegram.ext import Updater
 import logging
 
-from meeting import start, not_found, register, search
+from meeting import start, not_found, register, search, list
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -25,6 +25,7 @@ def main():
     dp = updater.dispatcher
 
     dp.add_handler(start.handler)
+    dp.add_handler(list.handler)
     dp.add_handler(register.handler)
     dp.add_handler(search.handler)
     dp.add_handler(not_found.handler)
